@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/evmos/validator-status/pkg/config"
@@ -20,6 +21,7 @@ type Server struct {
 	// Go rutine to run updates
 	updateTicker *time.Ticker
 	doneTicker   chan bool
+	updateMutex  sync.Mutex
 
 	// Database
 	db *database.Queries
@@ -43,8 +45,9 @@ func NewServer(config *config.Config, db *database.Queries) *Server {
 		Server:       &http.Server{},
 		updateTicker: time.NewTicker(tickerDuration),
 		doneTicker:   make(chan bool),
+		updateMutex:  sync.Mutex{},
 		db:           db,
-		cosmos:       cosmos.NewCosmos(config.CosmosAPI, db),
+		cosmos:       cosmos.NewCosmos(config.CosmosAPI, config.CosmosRPC, db),
 	}
 
 	router.Path(HomePrefix).HandlerFunc(server.HandlerHome).Methods(http.MethodGet, http.MethodPost, http.MethodOptions)

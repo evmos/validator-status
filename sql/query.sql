@@ -11,6 +11,9 @@ INSERT INTO missed_blocks(
    ?, ?, ?
 );
 
+-- name: GetLatestHeight :one
+SELECT height FROM missed_blocks ORDER BY height DESC LIMIT 1;
+
 -- name: InsertValidator :one
 INSERT INTO validators(
     operator_address, pubkey, validator_address, moniker, indentity

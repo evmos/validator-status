@@ -15,9 +15,14 @@ Config Example:
     "port": "42069"
   },
   "cosmosapi": "localhost:1317",
+  "cosmosrpc": "localhost:26656",
+  "pruneoffset": 100,
   "refreshduration": "5s"
 }
 ```
+
+- `Pruneoffset` is the value of your node pruned settings. The program will use the information from the latest height - pruneoffset to index the chain
+- `Refreshduration` is the time the program will wait until pulling new blocks values
 
 ## Database
 

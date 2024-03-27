@@ -9,4 +9,6 @@ type Config struct {
 	RefreshDuration string `json:"refreshduration"`
 	DatabaseFile    string `json:"dbfile"`
 	CosmosAPI       string `json:"cosmosapi"`
+	CosmosRPC       string `json:"cosmosrpc"`
+	PruneOffset     int    `json:"pruneoffset"`
 }

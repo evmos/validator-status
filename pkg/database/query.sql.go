@@ -73,6 +73,17 @@ func (q *Queries) GetInfoByValidatorID(ctx context.Context, validatorID int64) (
 	return items, nil
 }
 
+const getLatestHeight = `-- name: GetLatestHeight :one
+SELECT height FROM missed_blocks ORDER BY height DESC LIMIT 1
+`
+
+func (q *Queries) GetLatestHeight(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getLatestHeight)
+	var height int64
+	err := row.Scan(&height)
+	return height, err
+}
+
 const getValidatorByMoniker = `-- name: GetValidatorByMoniker :one
 SELECT id, operator_address, pubkey, validator_address, moniker, indentity FROM validators WHERE moniker = ? LIMIT 1
 `

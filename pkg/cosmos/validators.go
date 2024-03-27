@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/evmos/validator-status/pkg/database"
 	"github.com/evmos/validator-status/pkg/logger"
@@ -29,12 +30,11 @@ type ValidatorsResponse struct {
 	Validators []Validator
 }
 
-func (c *Cosmos) getValidators() (ValidatorsResponse, error) {
-	resp, err := http.Get(c.apiURL + "/cosmos/staking/v1beta1/validators")
-	if err != nil {
-		return ValidatorsResponse{}, err
-	}
+func (c *Cosmos) getValidators(height string) (ValidatorsResponse, error) {
+	reqGo, err := http.NewRequest("GET", c.apiURL+"/cosmos/staking/v1beta1/validators", nil)
+	reqGo.Header.Set("x-cosmos-block-height", height)
 
+	resp, err := http.DefaultClient.Do(reqGo)
 	if resp.StatusCode != http.StatusOK {
 		return ValidatorsResponse{}, fmt.Errorf("status code %d", resp.StatusCode)
 	}
@@ -87,8 +87,8 @@ func (c *Cosmos) addValidatorsToDatabase(vals []Validator) error {
 	return nil
 }
 
-func (c *Cosmos) UpdateValidatorsTable() error {
-	validators, err := c.getValidators()
+func (c *Cosmos) UpdateValidatorsTable(height int64) error {
+	validators, err := c.getValidators(strconv.Itoa(int(height)))
 	if err != nil {
 		return err
 	}

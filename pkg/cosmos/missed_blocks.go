@@ -23,13 +23,12 @@ type MissedBlockResponse struct {
 	} `json:"info"`
 }
 
-func (c *Cosmos) getMissedBlocksByHeight(height int64) (MissedBlockResponse, error) {
+func (c *Cosmos) getMissedBlocksByHeight(height string) (MissedBlockResponse, error) {
 	// NOTE: assumes that we do not need pagination
-	resp, err := http.Get(c.apiURL + "/cosmos/slashing/v1beta1/signing_infos")
-	if err != nil {
-		return MissedBlockResponse{}, err
-	}
+	reqGo, err := http.NewRequest("GET", c.apiURL+"/cosmos/slashing/v1beta1/signing_infos", nil)
+	reqGo.Header.Set("x-cosmos-block-height", height)
 
+	resp, err := http.DefaultClient.Do(reqGo)
 	if resp.StatusCode != http.StatusOK {
 		return MissedBlockResponse{}, fmt.Errorf("status code %d", resp.StatusCode)
 	}
@@ -76,7 +75,7 @@ func (c *Cosmos) addMissingBlocksInfoToDB(height int64, missingBlocks MissedBloc
 }
 
 func (c *Cosmos) UpdateMissingTable(height int64) error {
-	missingBlocks, err := c.getMissedBlocksByHeight(height)
+	missingBlocks, err := c.getMissedBlocksByHeight(strconv.Itoa(int(height)))
 	if err != nil {
 		return err
 	}
