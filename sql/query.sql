@@ -30,3 +30,9 @@ SELECT * FROM validators WHERE moniker = ? LIMIT 1;
 
 -- name: GetValidatorByValidatorAddress :one
 SELECT * FROM validators WHERE validator_address = ? LIMIT 1;
+
+-- name: GetInfoBetweenBlocks :many
+SELECT * FROM missed_blocks m JOIN validators v ON m.validator_id = v.id WHERE m.height BETWEEN ? AND ?;
+
+-- name: GetValidatorInfoBetweenBlocks :many
+SELECT * FROM missed_blocks m JOIN validators v ON m.validator_id = v.id WHERE m.height BETWEEN ? AND ? AND v.operator_address = ?;

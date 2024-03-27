@@ -9,6 +9,62 @@ import (
 	"context"
 )
 
+const getInfoBetweenBlocks = `-- name: GetInfoBetweenBlocks :many
+SELECT m.id, height, validator_id, missed, v.id, operator_address, pubkey, validator_address, moniker, indentity FROM missed_blocks m JOIN validators v ON m.validator_id = v.id WHERE m.height BETWEEN ? AND ?
+`
+
+type GetInfoBetweenBlocksParams struct {
+	FromHeight int64
+	ToHeight   int64
+}
+
+type GetInfoBetweenBlocksRow struct {
+	ID               int64
+	Height           int64
+	ValidatorID      int64
+	Missed           int64
+	ID_2             int64
+	OperatorAddress  string
+	Pubkey           string
+	ValidatorAddress string
+	Moniker          string
+	Indentity        string
+}
+
+func (q *Queries) GetInfoBetweenBlocks(ctx context.Context, arg GetInfoBetweenBlocksParams) ([]GetInfoBetweenBlocksRow, error) {
+	rows, err := q.db.QueryContext(ctx, getInfoBetweenBlocks, arg.FromHeight, arg.ToHeight)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetInfoBetweenBlocksRow
+	for rows.Next() {
+		var i GetInfoBetweenBlocksRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Height,
+			&i.ValidatorID,
+			&i.Missed,
+			&i.ID_2,
+			&i.OperatorAddress,
+			&i.Pubkey,
+			&i.ValidatorAddress,
+			&i.Moniker,
+			&i.Indentity,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getInfoByBlock = `-- name: GetInfoByBlock :many
 SELECT id, height, validator_id, missed FROM missed_blocks WHERE height = ?
 `
@@ -136,6 +192,63 @@ func (q *Queries) GetValidatorByValidatorAddress(ctx context.Context, validatorA
 		&i.Indentity,
 	)
 	return i, err
+}
+
+const getValidatorInfoBetweenBlocks = `-- name: GetValidatorInfoBetweenBlocks :many
+SELECT m.id, height, validator_id, missed, v.id, operator_address, pubkey, validator_address, moniker, indentity FROM missed_blocks m JOIN validators v ON m.validator_id = v.id WHERE m.height BETWEEN ? AND ? AND v.operator_address = ?
+`
+
+type GetValidatorInfoBetweenBlocksParams struct {
+	Height          int64
+	Height_2        int64
+	OperatorAddress string
+}
+
+type GetValidatorInfoBetweenBlocksRow struct {
+	ID               int64
+	Height           int64
+	ValidatorID      int64
+	Missed           int64
+	ID_2             int64
+	OperatorAddress  string
+	Pubkey           string
+	ValidatorAddress string
+	Moniker          string
+	Indentity        string
+}
+
+func (q *Queries) GetValidatorInfoBetweenBlocks(ctx context.Context, arg GetValidatorInfoBetweenBlocksParams) ([]GetValidatorInfoBetweenBlocksRow, error) {
+	rows, err := q.db.QueryContext(ctx, getValidatorInfoBetweenBlocks, arg.Height, arg.Height_2, arg.OperatorAddress)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetValidatorInfoBetweenBlocksRow
+	for rows.Next() {
+		var i GetValidatorInfoBetweenBlocksRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Height,
+			&i.ValidatorID,
+			&i.Missed,
+			&i.ID_2,
+			&i.OperatorAddress,
+			&i.Pubkey,
+			&i.ValidatorAddress,
+			&i.Moniker,
+			&i.Indentity,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const insertMissedBlockInfo = `-- name: InsertMissedBlockInfo :exec

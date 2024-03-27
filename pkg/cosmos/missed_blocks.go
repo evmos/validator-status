@@ -26,9 +26,15 @@ type MissedBlockResponse struct {
 func (c *Cosmos) getMissedBlocksByHeight(height string) (MissedBlockResponse, error) {
 	// NOTE: assumes that we do not need pagination
 	reqGo, err := http.NewRequest("GET", c.apiURL+"/cosmos/slashing/v1beta1/signing_infos", nil)
+	if err != nil {
+		return MissedBlockResponse{}, fmt.Errorf("error creating the request %s", err.Error())
+	}
 	reqGo.Header.Set("x-cosmos-block-height", height)
 
 	resp, err := http.DefaultClient.Do(reqGo)
+	if err != nil {
+		return MissedBlockResponse{}, fmt.Errorf("error making the request %s", err.Error())
+	}
 	if resp.StatusCode != http.StatusOK {
 		return MissedBlockResponse{}, fmt.Errorf("status code %d", resp.StatusCode)
 	}
