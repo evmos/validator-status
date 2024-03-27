@@ -40,6 +40,7 @@ func (s *Server) UpdateValidators() {
 		return
 	}
 	defer s.updateMutex.Unlock()
+	logger.LogDebug("calling update validators")
 
 	// Get the chain latest height
 	chainHeight, err := s.cosmos.GetChainHeight()
@@ -57,10 +58,13 @@ func (s *Server) UpdateValidators() {
 		return
 	}
 
+	logger.LogDebug(fmt.Sprintf("height %d chainHeight %d", height, chainHeight.CurrentHeight))
+
 	stopHeight := chainHeight.CurrentHeight
 	if stopHeight-int(height) > maxBlocksToProcessAtTheTime {
 		stopHeight = int(height) + maxBlocksToProcessAtTheTime
 	}
+	logger.LogDebug(fmt.Sprintf("height %d stopHeight %d", height, stopHeight))
 
 	// Move to the first not indexed block
 	height++

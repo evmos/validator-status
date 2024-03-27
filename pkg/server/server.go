@@ -42,7 +42,6 @@ func NewServer(config *config.Config, db *database.Queries) *Server {
 	server := &Server{
 		config:       config,
 		Router:       router,
-		Server:       &http.Server{},
 		updateTicker: time.NewTicker(tickerDuration),
 		doneTicker:   make(chan bool),
 		updateMutex:  sync.Mutex{},
@@ -50,7 +49,7 @@ func NewServer(config *config.Config, db *database.Queries) *Server {
 		cosmos:       cosmos.NewCosmos(config.CosmosAPI, config.CosmosRPC, db),
 	}
 
-	router.Path(HomePrefix).HandlerFunc(server.HandlerHome).Methods(http.MethodGet, http.MethodPost, http.MethodOptions)
+	server.Router.Path(APIPrefix).HandlerFunc(server.HandlerAPI).Methods(http.MethodGet, http.MethodPost, http.MethodOptions)
 
 	return server
 }

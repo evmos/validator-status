@@ -11,4 +11,5 @@ type Config struct {
 	CosmosAPI       string `json:"cosmosapi"`
 	CosmosRPC       string `json:"cosmosrpc"`
 	PruneOffset     int    `json:"pruneoffset"`
+	APIMaxLimit     int    `json:"apimaxlimit"`
 }

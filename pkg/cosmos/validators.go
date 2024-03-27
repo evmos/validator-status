@@ -32,9 +32,16 @@ type ValidatorsResponse struct {
 
 func (c *Cosmos) getValidators(height string) (ValidatorsResponse, error) {
 	reqGo, err := http.NewRequest("GET", c.apiURL+"/cosmos/staking/v1beta1/validators", nil)
+	if err != nil {
+		return ValidatorsResponse{}, fmt.Errorf("error creating the request %s", err.Error())
+	}
+
 	reqGo.Header.Set("x-cosmos-block-height", height)
 
 	resp, err := http.DefaultClient.Do(reqGo)
+	if err != nil {
+		return ValidatorsResponse{}, fmt.Errorf("error making the request %s", err.Error())
+	}
 	if resp.StatusCode != http.StatusOK {
 		return ValidatorsResponse{}, fmt.Errorf("status code %d", resp.StatusCode)
 	}

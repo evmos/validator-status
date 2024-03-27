@@ -1,14 +1,14 @@
 package main
 
 import (
-	_ "github.com/mattn/go-sqlite3"
-
 	"context"
 	"flag"
 	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+
+	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/evmos/validator-status/pkg/config"
 	"github.com/evmos/validator-status/pkg/database"
